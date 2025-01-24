@@ -1,0 +1,16 @@
+{
+    "timeout": 30000,
+    "expect": { "timeout": 5000 },
+    "use": {
+        "headless": true,
+        "storageState": "storage_state.json",
+        "ignoreHTTPSErrors": true,
+        "viewport": { "width": 1920, "height": 1080 },
+        "baseURL": "https://www.kinopoisk.ru"
+    },
+    "projects": [
+        { "name": "Chromium", "use": { "browserName": "chromium" } },
+        { "name": "Firefox", "use": { "browserName": "firefox" } }
+    ],
+    "reporter": [["list"], ["json", { "outputFile": "results.json" }]]
+}

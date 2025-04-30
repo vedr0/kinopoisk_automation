@@ -149,10 +149,6 @@ def test_advanced_search_f1(page: Page, test_case):
     select_field("m_act[box_type]", test_case["Регион сборов"])
     select_field("m_act[content_find]", test_case["Что искать?"])
 
-    # # Явно активируем кнопку поиска
-    # print("🔧 Вызов CheckFields(1) для активации кнопки поиска")
-    # page.evaluate("CheckFields(1)")
-
     if not search_button.is_enabled():
         notice_block = page.locator("#ui_notice_container .tdtext", has_text="уменьшите количество лет")
         if notice_block.is_visible():

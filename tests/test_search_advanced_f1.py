@@ -1,5 +1,6 @@
 import pytest
 from playwright.sync_api import Page, expect
+from utils.page_analysis import analyze_result_page
 import csv
 import time
 
@@ -80,51 +81,51 @@ def test_advanced_search_f1(page: Page, test_case):
         select.select_option(valid_values)
         print(f"✅ Выбраны жанры: {valid_values}")
 
-    def analyze_result_page(page: Page, test_case: dict):
-        try:
-            # 🔍 Обработка случая, когда указана только страна
-            country_value = test_case.get("Страна", "").strip()
-            has_only_country = (
-                    country_value and country_value != "-"
-                    and all(
-                v.strip() in ("", "-")
-                for k, v in test_case.items()
-                if k != "Страна"
-            )
-            )
-            if has_only_country:
-                expected_url_part = f"/lists/m_act[country]/{country_value}/"
-                if expected_url_part in page.url:
-                    print(f"✅ Перешли на страницу фильмов по стране: {page.url}")
-                    return
-                else:
-                    pytest.xfail(f"❌ Ожидался редирект на {expected_url_part}, но URL: {page.url}")
-
-            # Если это точное совпадение (страница фильма)
-            if "/film/" in page.url:
-                print(f"✅ Фильм найден: {page.url}")
-                return
-
-            # Если форма не сработала (остались на /s/)
-            if page.url == "https://www.kinopoisk.ru/s/":
-                pytest.xfail("Форма не отработала: остались на /s/")
-
-            # Проверка текста "ничего не найдено"
-            if page.locator("h2.textorangebig", has_text="ничего не найдено").is_visible():
-                pytest.xfail(f"Ожидаемый провал теста: '{test_case['Название фильма']}' не найден.")
-
-            # Проверка, что это страница похожих фильмов
-            header_similar = page.locator("p.header", has_text="Скорее всего, вы ищете:")
-            if header_similar.is_visible():
-                print("✅ Открылась страница похожих фильмов")
-                return
-
-            # Если ни один из паттернов не сработал — отладочный вывод
-            print("🔍 Отладка: p.header видим?", header_similar.is_visible())
-            pytest.fail(f"❌ Неожиданный результат. URL: {page.url}")
-
-        except Exception as e:
-            pytest.fail(f"❌ Ошибка при анализе результата: {e}")
+    # def analyze_result_page(page: Page, test_case: dict):
+    #     try:
+    #         # 🔍 Обработка случая, когда указана только страна
+    #         country_value = test_case.get("Страна", "").strip()
+    #         has_only_country = (
+    #                 country_value and country_value != "-"
+    #                 and all(
+    #             v.strip() in ("", "-")
+    #             for k, v in test_case.items()
+    #             if k != "Страна"
+    #         )
+    #         )
+    #         if has_only_country:
+    #             expected_url_part = f"/lists/m_act[country]/{country_value}/"
+    #             if expected_url_part in page.url:
+    #                 print(f"✅ Перешли на страницу фильмов по стране: {page.url}")
+    #                 return
+    #             else:
+    #                 pytest.xfail(f"❌ Ожидался редирект на {expected_url_part}, но URL: {page.url}")
+    #
+    #         # Если это точное совпадение (страница фильма)
+    #         if "/film/" in page.url:
+    #             print(f"✅ Фильм найден: {page.url}")
+    #             return
+    #
+    #         # Если форма не сработала (остались на /s/)
+    #         if page.url == "https://www.kinopoisk.ru/s/":
+    #             pytest.xfail("Форма не отработала: остались на /s/")
+    #
+    #         # Проверка текста "ничего не найдено"
+    #         if page.locator("h2.textorangebig", has_text="ничего не найдено").is_visible():
+    #             pytest.xfail(f"Ожидаемый провал теста: '{test_case['Название фильма']}' не найден.")
+    #
+    #         # Проверка, что это страница похожих фильмов
+    #         header_similar = page.locator("p.header", has_text="Скорее всего, вы ищете:")
+    #         if header_similar.is_visible():
+    #             print("✅ Открылась страница похожих фильмов")
+    #             return
+    #
+    #         # Если ни один из паттернов не сработал — отладочный вывод
+    #         print("🔍 Отладка: p.header видим?", header_similar.is_visible())
+    #         pytest.fail(f"❌ Неожиданный результат. URL: {page.url}")
+    #
+    #     except Exception as e:
+    #         pytest.fail(f"❌ Ошибка при анализе результата: {e}")
 
     fill_field("m_act[find]", test_case["Название фильма"])
     fill_field("m_act[year]", test_case["Год"])
@@ -163,4 +164,4 @@ def test_advanced_search_f1(page: Page, test_case):
         pytest.xfail("Форма не отработала: остались на /s/")
     time.sleep(3)
 
-    analyze_result_page(page, test_case)
+    analyze_result_page(page, test_case, mode="f1")

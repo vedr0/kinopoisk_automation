@@ -1,114 +1,81 @@
 import pytest
+import allure
 from playwright.sync_api import Page
+pytestmark = pytest.mark.base
 
+@allure.suite("Поиск по сайту")
+@allure.sub_suite("Полное название фильма")
 @pytest.mark.parametrize("movie_name, expected_result", [
     ("Интерстеллар", "Интерстеллар"),
     ("Джентльмены", "Джентльмены"),
 ])
+@allure.title("Поиск по полному названию: {movie_name}")
 def test_search_movie_by_full_name(page: Page, movie_name: str, expected_result: str):
-    """
-    Тест: Поиск фильма по полному названию.
-    Шаги:
-    1. Ввести название фильма в поле поиска.
-    2. Нажать Enter.
-    Ожидание:
-    - На странице отображается список результатов.
-    - Первый результат соответствует запросу.
-    """
     page.goto("https://www.kinopoisk.ru/")
-    # Находим поле поиска и вводим название фильма
     search_input = page.locator('[name="kp_query"]')
     search_input.fill(movie_name)
     search_input.press("Enter")
-    # Ожидаем загрузку страницы с результатами поиска
     page.wait_for_selector(".search_results")
-    # Проверяем, что первый результат соответствует запросу
     first_result = page.locator(".search_results .name a").first
-    assert first_result.inner_text() == expected_result, (
-        f"Ожидалось: {expected_result}, но найдено: {first_result.inner_text()}"
-    )
+    assert first_result.inner_text() == expected_result
 
+@allure.sub_suite("Альтернативные названия")
 @pytest.mark.parametrize("alt_name, expected_result", [
-    ("Star Wars", "Звездные войны"),  # Пример с альтернативным названием
+    ("Star Wars", "Звездные войны"),
     ("Avengers", "Мстители"),
 ])
+@allure.title("Поиск по альтернативному названию: {alt_name}")
 def test_search_by_alternative_name(page: Page, alt_name: str, expected_result: str):
-    """
-    Тест: Поиск фильма по альтернативному названию.
-    Шаги:
-    1. Ввести альтернативное название фильма/сериала в поле поиска.
-    2. Нажать Enter.
-    Ожидание:
-    - Найден фильм по альтернативному названию.
-    """
     page.goto("https://www.kinopoisk.ru/")
     search_input = page.locator('[name="kp_query"]')
     search_input.fill(alt_name)
     search_input.press("Enter")
     page.wait_for_selector(".search_results")
-    # Проверяем, что alt_name или expected_result присутствует в любом элементе
     results = page.locator(".search_results .name")
-    found = False
-    for i in range(results.count()):
-        if alt_name in results.nth(i).inner_text() or expected_result in results.nth(i).inner_text():
-            found = True
-            break
+    found = any(alt_name in results.nth(i).inner_text() or expected_result in results.nth(i).inner_text() for i in range(results.count()))
+    assert found
 
-    assert found, f"'{alt_name}' или '{expected_result}' не найдены в результатах поиска."
-
+@allure.sub_suite("Проверка регистра")
 @pytest.mark.parametrize("movie_name, expected_result", [
     ("ИнТеРсТеЛлАр", "Интерстеллар"),
     ("мСтИТеЛи", "Мстители"),
 ])
+@allure.title("Поиск с нечувствительностью к регистру: {movie_name}")
 def test_search_case_insensitive(page: Page, movie_name: str, expected_result: str):
-    """
-    Тест: Поиск фильма с учетом регистра.
-    Шаги:
-    1. Ввести название в произвольном регистре.
-    2. Нажать Enter.
-    Ожидание:
-    - Найден фильм по корректному названию.
-    """
     page.goto("https://www.kinopoisk.ru/")
     search_input = page.locator('[name="kp_query"]')
     search_input.fill(movie_name)
     search_input.press("Enter")
     page.wait_for_selector(".search_results")
     first_result = page.locator(".search_results .name").first
-    assert expected_result in first_result.inner_text(), (
-        f"Ожидалось: {expected_result}, но найдено: {first_result.inner_text()}"
-    )
+    assert expected_result in first_result.inner_text()
 
+@allure.sub_suite("Частичные совпадения")
 @pytest.mark.parametrize("partial_name", [
     "Интер",
     "Star",
     "Ават",
 ])
+@allure.title("Поиск по части названия: {partial_name}")
 def test_partial_name_search(page: Page, partial_name: str):
-    # Ввод частичного названия
     page.goto("https://www.kinopoisk.ru/")
     search_input = page.locator('[name="kp_query"]')
     search_input.fill(partial_name)
     search_input.press("Enter")
     page.wait_for_selector(".search_results")
-    # Проверяем, что хотя бы один из результатов содержит partial_name
     results = page.locator(".search_results .name")
-    found = False
-    for i in range(results.count()):
-        if partial_name.lower() in results.nth(i).inner_text().lower():
-            found = True
-            break
+    found = any(partial_name.lower() in results.nth(i).inner_text().lower() for i in range(results.count()))
+    assert found
 
-    assert found, f"'{partial_name}' не найдено в результатах поиска"
-
+@allure.sub_suite("Невалидные запросы")
 @pytest.mark.parametrize("invalid_query, expected_message", [
-    ("abcdefg", "К сожалению, по вашему запросу ничего не найдено..."),  # Несуществующее название
-    ("!!!@@@", "К сожалению, по вашему запросу ничего не найдено..."),  # Специальные символы
-    ("a" * 100, "К сожалению, по вашему запросу ничего не найдено..."),  # Длинный запрос
-    ("'; DROP TABLE movies;--", "К сожалению, по вашему запросу ничего не найдено..."),  # SQL-инъекция
-    ("<script>alert('XSS')</script>", "К сожалению, по вашему запросу ничего не найдено...")  # XSS
+    ("abcdefg", "К сожалению, по вашему запросу ничего не найдено..."),
+    ("!!!@@@", "К сожалению, по вашему запросу ничего не найдено..."),
+    ("a" * 100, "К сожалению, по вашему запросу ничего не найдено..."),
+    ("'; DROP TABLE movies;--", "К сожалению, по вашему запросу ничего не найдено..."),
+    ("<script>alert('XSS')</script>", "К сожалению, по вашему запросу ничего не найдено..."),
 ])
-
+@allure.title("Невалидный запрос: {invalid_query}")
 def test_invalid_search(page: Page, invalid_query: str, expected_message: str):
     page.goto("https://www.kinopoisk.ru/")
     search_input = page.locator('[name="kp_query"]')
@@ -116,16 +83,15 @@ def test_invalid_search(page: Page, invalid_query: str, expected_message: str):
     search_input.press("Enter")
     no_results_message = page.locator("h2.textorangebig").first
     no_results_message.wait_for(state="visible")
+    assert no_results_message.is_visible()
+    assert expected_message in no_results_message.inner_text()
 
-    assert no_results_message.is_visible(), "Сообщение о том, что ничего не найдено, не отображается."
-    assert expected_message in no_results_message.inner_text(), f"Ожидалось сообщение '{expected_message}', но получено '{no_results_message.inner_text()}'"
-
-
+@allure.sub_suite("Пустой запрос")
+@allure.title("Поиск с пустым запросом")
 def test_empty_query(page: Page):
     page.goto("https://www.kinopoisk.ru/")
     search_input = page.locator('[name="kp_query"]')
     search_input.fill("")
     search_input.press("Enter")
     page.wait_for_url("https://www.kinopoisk.ru/chance/", timeout=5000)
-
-    assert "chance" in page.url, f"Ожидался переход на /chance/, но открыта страница {page.url}"
+    assert "chance" in page.url

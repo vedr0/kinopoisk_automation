@@ -1,6 +1,8 @@
 import pytest
+import allure
 from playwright.sync_api import Page
 
+@allure.step("Анализ страницы результата поиска")
 def analyze_result_page(page: Page, test_case: dict, mode: str = "f1"):
     try:
         # 🔹 Частный случай: переход на список фильмов по стране — только для f1

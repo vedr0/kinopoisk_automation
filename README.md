@@ -9,15 +9,17 @@
 ```
 kinopoisk_automation/
 ├── tests/
-│   ├── test_search_advanced_f1.py   # тесты формы f1 «Искать фильм»
-│   ├── test_search_by_creator_f2.py # тесты формы f2 «Искать по создателям»
-│   └── test_search_base.py          # базовый поиск по названию
+│ ├── test_search_advanced_f1.py      # тесты формы f1 «Искать фильм»
+│ ├── test_search_by_creator_f2.py    # тесты формы f2 «Искать по создателям»
+│ └── test_search_base.py             # базовый поиск по названию
 ├── utils/
-│   └── page_analysis.py             # общий анализ результата поиска
+│ ├── page_analysis.py                # общий анализ результата поиска
+│ └── form_interaction.py             # заполнение полей форм f1 и f2
+├── page_objects/
+│ └── advanced_search_page.py         # Page Object для форм f1 и f2
 ├── test_data/
-│   ├── f1_advanced_search_test_data.csv
-│   ├── f2_creator_search_test_data.csv
-│   └── base_search_test_data.csv (если есть)
+│ ├── f1_advanced_search_test_data.csv
+│ └── f2_creator_search_test_data.csv
 ├── requirements.txt
 ├── README.md
 └── pytest.ini

@@ -1,7 +1,3 @@
-"""
-Общая логика для всех страниц
-"""
-
 from playwright.sync_api import Page
 
 class BasePage:
@@ -11,6 +7,5 @@ class BasePage:
         self.search_button = "button[aria-label='Найти']"  # Кнопка поиска
 
     def perform_search(self, query: str):
-        """Выполнить поиск по базовому запросу."""
         self.page.fill(self.search_input, query)
         self.page.click(self.search_button)

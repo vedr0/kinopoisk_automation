@@ -28,7 +28,7 @@ def fill_field(page: Page, mode: str, field_name: str, value: str):
             else:
                 field.fill(value)
 
-            print(f"✅ Заполнено поле '{field_name}': {value}")
+            print(f"📝 Заполнено поле '{field_name}': {value}")
         except Exception:
             pytest.fail(f"❌ Ошибка при заполнении '{field_name}'")
 
@@ -44,7 +44,7 @@ def select_field(page: Page, mode: str, field_name: str, value: str):
             if value not in available_values:
                 pytest.xfail(f"Недопустимое значение '{value}' для поля '{field_name}'")
             field.select_option(value)
-            print(f"✅ Выбрано поле '{field_name}': {value}")
+            print(f"📝 Выбрано поле '{field_name}': {value}")
         except Exception as e:
             pytest.fail(f"❌ Ошибка при выборе '{field_name}': {e}")
 
@@ -62,7 +62,7 @@ def select_genres(page: Page, mode: str, values: list[str]):
 
     select.evaluate("el => Array.from(el.options).forEach(o => o.selected = false)")
     select.select_option(valid_values)
-    print(f"✅ Выбраны жанры: {valid_values}")
+    print(f"📝 Выбраны жанры: {valid_values}")
 
 
 @allure.step("Заполнение пары Роль + Имя в f2")
@@ -72,7 +72,7 @@ def fill_creator_pair(page: Page, index: int, role: str, name: str):
         page.wait_for_selector(f"#cr_search_field_{index}_select", timeout=10000)
         expect(role_select).to_be_visible()
         role_select.select_option(role)
-    print(f"✅ Роль {index}: {role}")
+    print(f"📝 Роль {index}: {role}")
 
     if name and name.strip():
         name_input = page.locator(f"#cr_search_field_{index}")
@@ -94,4 +94,4 @@ def fill_creator_pair(page: Page, index: int, role: str, name: str):
             pytest.xfail(f"❌ Страница изменилась после выбора из автокомплита '{name}' (role: {role}): {page.url}")
 
         name_input.evaluate("el => el.blur()")
-        print(f"✅ Имя {index}: {name}")
+        print(f"📝 Имя {index}: {name}")

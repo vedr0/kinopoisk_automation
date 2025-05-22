@@ -3,7 +3,7 @@ import allure
 import csv
 from playwright.sync_api import Page
 from utils.page_analysis import analyze_result_page
-from utils.form_interaction import fill_creator_pair
+from page_objects.advanced_search_page import AdvancedSearchPage
 
 
 def load_test_data():
@@ -20,36 +20,12 @@ def load_test_data():
 @allure.title("Тест формы поиска по создателям (f2)")
 @allure.description("Форма f2: проверка работы автокомплита и комбинаций ролей + имён")
 def test_search_by_creator_f2(page: Page, test_case):
-    page.goto("https://www.kinopoisk.ru/s/", wait_until="load")
-    page.wait_for_selector("form[name='keyword_search']", timeout=30000)
-    print(f"\n🔎 Запуск теста f2 с параметрами: {test_case}")
+    search_page = AdvancedSearchPage(page)
+    search_page.open()
 
-    search_form = page.locator("form[name='keyword_search']")
-    search_button = search_form.locator("#btn_search_6")
+    print(f"\n🧪 Запуск теста f2 с параметрами: {test_case}")
 
-    # Перебор всех пар "Роль N" + "Имя N"
-    index = 1
-    while True:
-        role_key = f"Роль {index}"
-        name_key = f"Имя {index}"
-        if role_key not in test_case and name_key not in test_case:
-            break
-
-        role = test_case.get(role_key, "").strip()
-        name = test_case.get(name_key, "").strip()
-
-        if not role and not name:
-            break
-
-        fill_creator_pair(page, index, role, name)
-        index += 1
-
-    # page.evaluate("CheckFields(6)")  # ручная активация кнопки
-
-    if not search_button.is_enabled():
-        pytest.xfail("❌ Кнопка поиска неактивна — вероятно, автокомплит не сработал")
-
-    search_button.click()
-    page.wait_for_load_state("load")
+    search_page.fill_form_f2(test_case)
+    search_page.submit_f2()
 
     analyze_result_page(page, test_case, mode="f2")

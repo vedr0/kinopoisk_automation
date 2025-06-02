@@ -1,11 +1,13 @@
 import pytest
 import allure
 import csv
+import logging
 from playwright.sync_api import Page
 from utils.page_analysis import analyze_result_page
 from page_objects.advanced_search_page import AdvancedSearchPage
 
 
+logger = logging.getLogger(__name__)
 def load_test_data():
     test_data = []
     with open("test_data/f2_creator_search_test_data.csv", encoding="utf-8") as f:
@@ -23,7 +25,7 @@ def test_search_by_creator_f2(page: Page, test_case):
     search_page = AdvancedSearchPage(page)
     search_page.open()
 
-    print(f"\n🧪 Запуск теста f2 с параметрами: {test_case}")
+    logger.info(f"\n🧪 Запуск теста f2 с параметрами: {test_case}")
 
     search_page.fill_form_f2(test_case)
     search_page.submit_f2()

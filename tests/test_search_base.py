@@ -3,7 +3,6 @@ import allure
 from playwright.sync_api import Page
 pytestmark = pytest.mark.base
 
-@allure.suite("Поиск по сайту")
 @allure.sub_suite("Полное название фильма")
 @pytest.mark.parametrize("movie_name, expected_result", [
     ("Интерстеллар", "Интерстеллар"),

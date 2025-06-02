@@ -8,5 +8,6 @@ __pycache__/
 # Логи и отладочная информация
 *.log
 allure-results/
+allure-report/
 
 .idea/

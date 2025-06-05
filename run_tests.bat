@@ -31,22 +31,22 @@ echo 6. Open Allure-report
 echo 7. Delete Allure-report
 echo 8. Quit
 
-set /p choice=Chose option number (1-7):
+set /p choice=Choose option number (1-8):
 
 if "%choice%"=="1" (
-    pytest -p pytest_playwright --browser !BROWSER! --headed --alluredir=allure-results
+    pytest -s -p pytest_playwright --browser !BROWSER! --headed --alluredir=allure-results
     pause
 )
 if "%choice%"=="2" (
-    pytest -p pytest_playwright -m f1 --browser !BROWSER! --headed --alluredir=allure-results
+    pytest -s -p pytest_playwright -m f1 --browser !BROWSER! --headed --alluredir=allure-results
     pause
 )
 if "%choice%"=="3" (
-    pytest -p pytest_playwright -m f2 --browser !BROWSER! --headed --alluredir=allure-results
+    pytest -s -p pytest_playwright -m f2 --browser !BROWSER! --headed --alluredir=allure-results
     pause
 )
 if "%choice%"=="4" (
-    pytest -p pytest_playwright tests/test_search_base.py --browser !BROWSER! --headed --alluredir=allure-results
+    pytest -s -p pytest_playwright tests/test_search_base.py --browser !BROWSER! --headed --alluredir=allure-results
     pause
 )
 if "%choice%"=="5" (

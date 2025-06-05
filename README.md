@@ -1,5 +1,3 @@
-### README.md
-
 # Kinopoisk Automation Testing
 
 Автоматизация тестирования сайта [kinopoisk.ru](https://www.kinopoisk.ru) с использованием Playwright + Pytest + Allure.
@@ -9,20 +7,24 @@
 ```
 kinopoisk_automation/
 ├── tests/
-│ ├── test_search_advanced_f1.py      # тесты формы f1 «Искать фильм»
-│ ├── test_search_by_creator_f2.py    # тесты формы f2 «Искать по создателям»
-│ └── test_search_base.py             # базовый поиск по названию
+│ ├── test_search_advanced_f1.py # тесты формы f1 «Искать фильм»
+│ ├── test_search_by_creator_f2.py # тесты формы f2 «Искать по создателям»
+│ └── test_search_base.py # базовый поиск по названию
 ├── utils/
-│ ├── page_analysis.py                # общий анализ результата поиска
-│ └── form_interaction.py             # заполнение полей форм f1 и f2
+│ ├── form_interaction.py # функции заполнения форм f1 и f2
+│ ├── page_analysis.py # логика анализа результата поиска
+│ └── suite_utils.py # определение категории тестов для Allure SubSuite
 ├── page_objects/
-│ └── advanced_search_page.py         # Page Object для форм f1 и f2
+│ ├── base_page.py # базовая логика поиска
+│ └── advanced_search_page.py # Page Object для форм f1 и f2
 ├── test_data/
 │ ├── f1_advanced_search_test_data.csv
 │ └── f2_creator_search_test_data.csv
+├── run_tests.bat # CLI-меню запуска тестов и генерации отчёта
+├── Makefile # для кроссплатформенного тестирования
 ├── requirements.txt
-├── README.md
-└── pytest.ini
+├── pytest.ini
+└── README.md
 ```
 
 ## Команды запуска
@@ -31,6 +33,14 @@ kinopoisk_automation/
 ```
 pip install -r requirements.txt
 playwright install
+```
+### Запуск через CLI-меню
+```
+Файл `run_tests.bat` позволяет выбрать браузер и запустить:
+- все тесты сразу;
+- тесты форм f1, f2 или base отдельно;
+- генерацию и просмотр Allure-отчёта;
+- очистку папок `allure-results` и `allure-report`.
 ```
 
 ### Запуск всех тестов:
@@ -43,6 +53,12 @@ pytest --headed --alluredir=allure-results
 pytest tests/test_search_advanced_f1.py --headed --alluredir=allure-results
 pytest tests/test_search_by_creator_f2.py --headed --alluredir=allure-results
 pytest tests/test_search_base.py --headed --alluredir=allure-results
+
+pytest -m f1 --headed --alluredir=allure-results   # запуск тестов формы расширенного поиска f1
+pytest -m f2 --headed --alluredir=allure-results   # запуск тестов формы расширенного поиска f2
+pytest -m \"f1 or f2\" --headed --alluredir=allure-results  # все тесты форм
+pytest -m \"not f2\" --headed --alluredir=allure-results  # без f2
+
 ```
 
 ### Маркировка тестов:
@@ -56,15 +72,10 @@ allure generate allure-results -o allure-report --clean
 allure open allure-report
 ```
 
-## Дополнительно
-- Все нестабильные/ожидаемо проваливающиеся кейсы отмечены через `pytest.xfail()`
-- Данные загружаются из CSV (за исключением test_search_base)
-
----
-
-### requirements.txt
-
+## requirements.txt
 ```
 playwright>=1.43.0
 pytest>=8.0.0
 allure-pytest>=2.13.5
+pytest-playwright>=0.6.2
+```

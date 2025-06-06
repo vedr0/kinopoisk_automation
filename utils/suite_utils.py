@@ -22,7 +22,7 @@ def get_sub_suite_f1(test_case: dict) -> str:
                 return True
         return False
 
-    # Уникальные одно-польные кейсы
+    # Кейсы с заполнением одного поля
     if filled_fields == {"Название фильма"}:
         return "Поле: Название фильма - m_act[find]"
     if filled_fields == {"Год"}:
